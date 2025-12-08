@@ -1,0 +1,55 @@
+#!/usr/bin/env bash
+
+set -euo pipefail
+
+: ${CC:=clang}
+CFLAGS="-Wall -Wextra -Wpedantic -Werror -Wnull-dereference -Wformat=2
+-Wshadow -Wsign-conversion -Wfloat-equal -Wswitch-enum -Wmissing-prototypes
+-Wdeprecated-declarations -fsanitize=undefined -fsanitize=thread -std=c11
+-Isrc/ -I$THREADPOOL_INCLUDE"
+LDFLAGS="-lpthread"
+
+cc() {
+	echo "CC	$@"
+	$CC $CFLAGS $LDFLAGS $@
+}
+
+execute() {
+	echo "EXEC	$@"
+	$@
+}
+
+bundle() {
+	awk 'BEGIN { print "/**" } { print "* " $0 } END { print "**/" }' < LICENSE
+	echo
+	echo "#ifndef EVENTLOOP_H_INCLUDE"
+	echo "#define EVENTLOOP_H_INCLUDE"
+	cat src/eventloop.h
+	echo
+	echo "#ifdef EVENTLOOP_THREADPOOL"
+	cat src/impl/threadpool.c | grep -v 'eventloop.h'
+	echo
+	echo "#endif /* EVENTLOOP_THREADPOOL */"
+	echo
+	echo "#endif /* EVENTLOOP_H_INCLUDE */"
+}
+
+case "${1:-bundle}" in
+	bundle|eventloop.h)
+		bundle > eventloop.h
+		;;
+
+	test)
+		cc -I. test.c -o test
+		execute timeout 3s ./test
+		;;
+
+	compile_flags.txt)
+		echo $CFLAGS | tr ' ' '\n' > compile_flags.txt
+		;;
+
+	*)
+		echo "unknown command: '${1-}'" >&2
+		exit 1
+		;;
+esac
