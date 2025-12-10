@@ -3,10 +3,9 @@
 set -euo pipefail
 
 : ${CC:=clang}
-CFLAGS="-Wall -Wextra -Wpedantic -Werror -Wnull-dereference -Wformat=2
+CFLAGS="-Wall -Wextra -Werror -Wnull-dereference -Wformat=2
 -Wshadow -Wsign-conversion -Wfloat-equal -Wswitch-enum -Wmissing-prototypes
--Wdeprecated-declarations -fsanitize=undefined -fsanitize=thread -std=c11
--Isrc/ -I$THREADPOOL_INCLUDE"
+-Wdeprecated-declarations -fsanitize=undefined -fsanitize=thread -std=c11 -g"
 LDFLAGS="-lpthread"
 
 cc() {
@@ -17,6 +16,7 @@ cc() {
 execute() {
 	echo "EXEC	$@"
 	$@
+	echo "exit code $?"
 }
 
 bundle() {
@@ -24,10 +24,18 @@ bundle() {
 	echo
 	echo "#ifndef EVENTLOOP_H_INCLUDE"
 	echo "#define EVENTLOOP_H_INCLUDE"
-	cat src/eventloop.h
+	cat src/eventloop.h | grep -v '#include "'
 	echo
 	echo "#ifdef EVENTLOOP_THREADPOOL"
-	cat src/impl/threadpool.c | grep -v 'eventloop.h'
+	echo
+	echo "#define THREADPOOL_IMPLEMENTATION"
+	cat $THREADPOOL_INCLUDE/threadpool.h | grep -v '#include "'
+	echo
+	echo "#define MPSC_IMPLEMENTATION"
+	cat $MPSC_INCLUDE/mpsc.h | grep -v '#include "'
+	echo
+	cat src/impl/tpool.h | grep -v '#include "'
+	cat src/impl/tpool.c | grep -v '#include "'
 	echo
 	echo "#endif /* EVENTLOOP_THREADPOOL */"
 	echo
@@ -45,7 +53,8 @@ case "${1:-bundle}" in
 		;;
 
 	compile_flags.txt)
-		echo $CFLAGS | tr ' ' '\n' > compile_flags.txt
+		echo $CFLAGS -Isrc/ -I$THREADPOOL_INCLUDE -I$MPSC_INCLUDE \
+			| tr ' ' '\n' > compile_flags.txt
 		;;
 
 	*)
