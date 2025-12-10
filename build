@@ -2,6 +2,7 @@
 
 set -euo pipefail
 
+: ${REPO:="$(pwd)"}
 : ${CC:=clang}
 CFLAGS="-Wall -Wextra -Werror -Wnull-dereference -Wformat=2
 -Wshadow -Wsign-conversion -Wfloat-equal -Wswitch-enum -Wmissing-prototypes
@@ -20,11 +21,11 @@ execute() {
 }
 
 bundle() {
-	awk 'BEGIN { print "/**" } { print "* " $0 } END { print "**/" }' < LICENSE
+	awk 'BEGIN { print "/**" } { print "* " $0 } END { print "**/" }' < "$REPO"/LICENSE
 	echo
 	echo "#ifndef EVENTLOOP_H_INCLUDE"
 	echo "#define EVENTLOOP_H_INCLUDE"
-	cat src/eventloop.h | grep -v '#include "'
+	cat "$REPO"/src/eventloop.h | grep -v '#include "'
 	echo
 	echo "#ifdef EVENTLOOP_THREADPOOL"
 	echo
@@ -34,8 +35,8 @@ bundle() {
 	echo "#define MPSC_IMPLEMENTATION"
 	cat $MPSC_INCLUDE/mpsc.h | grep -v '#include "'
 	echo
-	cat src/impl/tpool.h | grep -v '#include "'
-	cat src/impl/tpool.c | grep -v '#include "'
+	cat "$REPO"/src/impl/tpool.h | grep -v '#include "'
+	cat "$REPO"/src/impl/tpool.c | grep -v '#include "'
 	echo
 	echo "#endif /* EVENTLOOP_THREADPOOL */"
 	echo
