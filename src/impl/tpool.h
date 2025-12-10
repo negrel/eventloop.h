@@ -50,6 +50,11 @@ struct evloop_private {
 };
 
 /**
+ * Main function of thread pool threads.
+ */
+void evloop_op_work(struct tpool_task *task);
+
+/**
  * Noop I/O operation. This is mainly used to measure overhead of the loop.
  */
 struct evloop_op_noop {
@@ -57,10 +62,15 @@ struct evloop_op_noop {
 	struct evloop_private private;
 };
 
-/**
- * Main function of thread pool threads.
- */
-void evloop_op_work(struct tpool_task *task);
+struct evloop_op_noop evloop_op_noop_init(evloop_callback callback)
+{
+	struct evloop_op_noop op = {0};
+	op.base.code = EVLOOP_OP_NOOP;
+	op.base.callback = callback;
+	op.private.task.next = ((void *)0);
+	op.private.task.work = evloop_op_work;
+	return op;
+}
 
 /**
  * Sleep I/O operation completes after `ms` milliseconds.
@@ -73,8 +83,6 @@ struct evloop_op_sleep evloop_op_sleep_init(struct evloop_sleep_data data,
 	op.base.code = EVLOOP_OP_SLEEP;
 	op.base.callback = callback;
 	op.data = data;
-	op.private.task.next = ((void *)0);
-	op.private.task.work = evloop_op_work;
 	return op;
 }
 
@@ -87,6 +95,9 @@ int evloop_queue_op(struct evloop *l, void *op)
 	// Cast as noop to access private field.
 	struct evloop_op_noop *noop = op;
 	noop->private.loop = l;
+	noop->private.task.next = NULL;
+	noop->private.task.next = NULL;
+	noop->private.task.work = evloop_op_work;
 
 	struct tpool_batch batch = tpool_batch_from_task(&noop->private.task);
 	tpool_batch_push(&l->batch, batch);

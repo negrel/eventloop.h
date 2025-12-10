@@ -52,6 +52,11 @@ case "${1:-bundle}" in
 		execute timeout 3s ./test
 		;;
 
+	bench)
+		cc -I. -O3 bench.c -o bench
+		execute ./bench
+		;;
+
 	compile_flags.txt)
 		echo $CFLAGS -Isrc/ -I$THREADPOOL_INCLUDE -I$MPSC_INCLUDE \
 			| tr ' ' '\n' > compile_flags.txt
