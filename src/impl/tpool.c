@@ -122,3 +122,18 @@ void evloop_op_work(struct tpool_task *task)
 	atomic_fetch_sub(&private->loop->pending, 1);
 	pthread_cond_signal(&private->loop->cond);
 }
+
+int evloop_queue_op(struct evloop *l, void *op)
+{
+	// Cast as noop to access private field.
+	struct evloop_op_noop *noop = op;
+	noop->private.loop = l;
+	noop->private.task.next = NULL;
+	noop->private.task.next = NULL;
+	noop->private.task.work = evloop_op_work;
+
+	struct tpool_batch batch = tpool_batch_from_task(&noop->private.task);
+	tpool_batch_push(&l->batch, batch);
+
+	return 0;
+}
