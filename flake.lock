@@ -180,11 +180,11 @@
         "nixpkgs": "nixpkgs_3"
       },
       "locked": {
-        "lastModified": 1765313958,
-        "narHash": "sha256-diy2l0w1UiugwaR5c4lKiOUV2nR1qZpfBF9h1En6Nmw=",
+        "lastModified": 1765393888,
+        "narHash": "sha256-C+3PNhg3pLRZOjPl6U4O8ZWEYxLnG4S2JGc2Cy11Hy4=",
         "owner": "negrel",
         "repo": "threadpool.h",
-        "rev": "435c79bc4381094c06fa5ccabee234705352fb63",
+        "rev": "56e094e6ae34e97aca1ba87700e0a6146b3b8b96",
         "type": "github"
       },
       "original": {
