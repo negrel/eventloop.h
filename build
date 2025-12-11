@@ -25,6 +25,7 @@ bundle() {
 	echo
 	echo "#ifndef EVENTLOOP_H_INCLUDE"
 	echo "#define EVENTLOOP_H_INCLUDE"
+	echo
 	cat "$REPO"/src/eventloop.h | grep -v '#include "'
 	echo
 	echo "#ifdef EVENTLOOP_THREADPOOL"

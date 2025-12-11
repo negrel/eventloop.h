@@ -1,6 +1,5 @@
 #include <stdatomic.h>
 #include <stddef.h>
-#include <stdio.h>
 #include <threads.h>
 
 #include "impl/tpool.h"
