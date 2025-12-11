@@ -3,6 +3,7 @@
 #include <stdio.h>
 #include <time.h>
 
+#define EVENTLOOP_IMPLEMENTATION
 #define EVENTLOOP_THREADPOOL
 #include "eventloop.h"
 

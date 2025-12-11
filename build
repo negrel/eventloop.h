@@ -22,26 +22,31 @@ execute() {
 
 bundle() {
 	awk 'BEGIN { print "/**" } { print "* " $0 } END { print "**/" }' < "$REPO"/LICENSE
-	echo
-	echo "#ifndef EVENTLOOP_H_INCLUDE"
-	echo "#define EVENTLOOP_H_INCLUDE"
-	echo
-	cat "$REPO"/src/eventloop.h | grep -v '#include "'
-	echo
-	echo "#ifdef EVENTLOOP_THREADPOOL"
-	echo
-	echo "#define THREADPOOL_IMPLEMENTATION"
-	cat $THREADPOOL_INCLUDE/threadpool.h | grep -v '#include "'
-	echo
-	echo "#define MPSC_IMPLEMENTATION"
-	cat $MPSC_INCLUDE/mpsc.h | grep -v '#include "'
-	echo
-	cat "$REPO"/src/impl/tpool.h | grep -v '#include "'
-	cat "$REPO"/src/impl/tpool.c | grep -v '#include "'
-	echo
-	echo "#endif /* EVENTLOOP_THREADPOOL */"
-	echo
-	echo "#endif /* EVENTLOOP_H_INCLUDE */"
+	cat <<EOF
+#ifndef EVENTLOOP_H_INCLUDE
+#define EVENTLOOP_H_INCLUDE
+
+$(cat "$REPO"/src/eventloop.h | grep -v '#include "')
+
+#ifdef EVENTLOOP_THREADPOOL
+
+#ifdef EVENTLOOP_IMPLEMENTATION
+#define THREADPOOL_IMPLEMENTATION
+#define MPSC_IMPLEMENTATION
+#endif /* EVENTLOOP_IMPLEMENTATION */
+
+$(cat $THREADPOOL_INCLUDE/threadpool.h | grep -v '#include "')
+$(cat $MPSC_INCLUDE/mpsc.h | grep -v '#include "')
+
+$(cat "$REPO"/src/impl/tpool.h | grep -v '#include "')
+
+#ifdef EVENTLOOP_IMPLEMENTATION
+$(cat "$REPO"/src/impl/tpool.c | grep -v '#include "')
+#endif /* EVENTLOOP_IMPLEMENTATION */
+
+#endif /* EVENTLOOP_THREADPOOL */
+#endif /* EVENTLOOP_H_INCLUDE */
+EOF
 }
 
 case "${1:-bundle}" in

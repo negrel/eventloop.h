@@ -1,3 +1,6 @@
+#ifndef EVLOOP_TPOOL_H_INCLUDE
+#define EVLOOP_TPOOL_H_INCLUDE
+
 #include <stdatomic.h>
 
 #include "eventloop.h"
@@ -104,3 +107,5 @@ int evloop_queue_op(struct evloop *l, void *op)
 
 	return 0;
 }
+
+#endif /* EVLOOP_TPOOL_H_INCLUDE */
