@@ -61,4 +61,7 @@ struct OP(sleep);
  * Do not use directly, use evloop_queue instead.
  */
 int evloop_queue_op(struct evloop *l, void *op);
+
+#undef OP
+
 #endif /* EVLOOP_TPOOL_H_INCLUDE */

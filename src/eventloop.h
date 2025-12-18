@@ -91,18 +91,5 @@ enum evloop_poll_mode {
  */
 int evloop_poll(struct evloop *l, enum evloop_poll_mode mode);
 
-#define OP_INIT(name, NAME)                                                    \
-	struct evloop_op_##name evloop_op_##name##_init(                       \
-	    struct evloop_##name##_data data, evloop_callback callback)
-
-#define OP_QUEUE(name)                                                         \
-	int evloop_queue_##name(struct evloop *l, struct evloop_op_##name *op)
-
-struct evloop_op_noop evloop_op_noop_init(evloop_callback callback);
-OP_QUEUE(noop);
-
-OP_INIT(sleep, SLEEP);
-OP_QUEUE(sleep);
-
 #undef OP_INIT
 #undef OP_QUEUE
